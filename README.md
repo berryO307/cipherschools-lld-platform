@@ -178,6 +178,10 @@ a Neon `DATABASE_URL` (free tier at [neon.tech](https://neon.tech)) and a
 `GEMINI_API_KEY` (free at [aistudio.google.com/apikey](https://aistudio.google.com/apikey)).
 Neither the repo history nor the deployed apps expose these values.
 
+## License
+
+[MIT](LICENSE) — free to use, modify, and learn from.
+
 ## Troubleshooting
 
 - **`DATABASE_URL is not set`** — you skipped `cp .env.example .env` in `server/`.
