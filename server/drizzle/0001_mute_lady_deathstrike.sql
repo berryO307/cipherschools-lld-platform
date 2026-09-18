@@ -1,0 +1,1 @@
+ALTER TABLE "evaluations" ADD COLUMN "summary" text DEFAULT '' NOT NULL;
