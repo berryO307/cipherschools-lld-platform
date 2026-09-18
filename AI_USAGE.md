@@ -1,6 +1,6 @@
 # AI Usage Log
 
-This project was built with Claude Code (Anthropic) as a pair-programming assistant.
+This project was built with an AI coding assistant as a pair programmer.
 This log documents five specific, meaningful instances where AI-proposed direction
 was accepted, corrected, or rejected during development, and why.
 
