@@ -1,7 +1,7 @@
 # AI Usage Log
 
 This project was built with Claude Code (Anthropic) as a pair-programming assistant.
-This log documents four specific, meaningful instances where AI-proposed direction
+This log documents five specific, meaningful instances where AI-proposed direction
 was accepted, corrected, or rejected during development, and why.
 
 ## 1. Monolith vs. Microservices / Job Queue
@@ -86,3 +86,23 @@ machine to allow `failed → evaluating`, added a dedicated
 a friendly alert plus a "Retry Evaluation" action. Verified live against the actual
 corrupted row from the bug above: it now resolves to `completed` with real
 feedback, with the original submission never deleted or re-typed.
+
+## 5. Deployment Pivot: Railway → Render
+
+**Context:** During the final deployment phase, Railway's free tier — the
+originally intended host for the Express backend — was found to have moved behind
+a hard paywall, blocking the planned deploy path entirely with no free option left.
+
+**Decision: pivoted the host, not the architecture.** Used AI to evaluate the
+alternative immediately (Render's free tier) and re-target the deployment without
+touching a single line of application code. The backend's actual contract with its
+environment was already platform-agnostic — it reads `PORT`, `DATABASE_URL`,
+`GEMINI_API_KEY`, and `FRONTEND_URL` from `process.env` and nothing more — so the
+only changes were operational: Render's build/start command pair
+(`npm install && npm run build` / `npm start`) instead of Railway's, and
+re-pointing the CORS allow-list's `FRONTEND_URL` at the same already-deployed
+Vercel frontend. The one real trade-off surfaced and documented rather than
+hidden: Render's free web services spin down after 15 minutes of inactivity, so
+the first request after idle time can take 30–60 seconds — called out as an
+explicit, bolded reviewer warning in `README.md` rather than left for a reviewer
+to discover (and potentially misdiagnose as a bug) on their own.

@@ -120,25 +120,63 @@ cd client && npm run dev
 
 ## Deployment notes
 
-- **Backend → Railway:**
-  - Build command: `npm run build` (compiles `src/` to `dist/` via `tsc`).
-  - Start command: `npm start` (runs `node dist/server.js`).
-  - Environment variables: `DATABASE_URL`, `GEMINI_API_KEY`, `FRONTEND_URL` (your
-    deployed Vercel URL, e.g. `https://your-app.vercel.app` — used for the CORS
-    allow-list), and optionally `SUBMIT_RATE_LIMIT`. `PORT` is provided by Railway
-    automatically; the app reads `process.env.PORT` and falls back to `4000` only
-    when unset.
-  - Run `npm run db:migrate` and `npm run db:seed` once against the production
-    `DATABASE_URL` before first use.
+The live deployment uses **Render** (free tier) for the backend and **Vercel** for
+the frontend. (An earlier pass targeted Railway; Render replaced it after Railway
+moved its free tier behind a paywall — no architecture changes were needed, only
+the platform-specific build/CORS config below. See `AI_USAGE.md`.)
+
+- **Backend → Render:**
+  1. **New → Web Service**, linked to this GitHub repo.
+  2. **Root Directory:** `server`
+  3. **Build Command:** `npm install && npm run build`
+  4. **Start Command:** `npm start` (runs `node dist/server.js`)
+  5. **Environment variables:**
+     - `DATABASE_URL` — your Neon connection string
+     - `GEMINI_API_KEY` — your Gemini API key
+     - `FRONTEND_URL` — your deployed Vercel URL (e.g. `https://your-app.vercel.app`)
+       — used for the CORS allow-list
+     - `SUBMIT_RATE_LIMIT` — optional, defaults to `5`
+     - `PORT` is provided by Render automatically; the app reads `process.env.PORT`
+       and only falls back to `4000` when unset — no action needed.
+  6. Run `npm run db:migrate` and `npm run db:seed` once against the production
+     `DATABASE_URL` before first use (via Render's shell, or from your own machine
+     with `DATABASE_URL` pointed at production).
+
+  > **⚠️ Reviewer warning — Render free tier spins down on inactivity.** A free
+  > Render web service is stopped after **15 minutes with no traffic** and takes
+  > **30–60 seconds to wake up** on the next request. **The very first API call
+  > after a period of idleness will be slow (up to ~60s) — this is expected, not a
+  > bug.** Every request after that first wake-up responds normally. If you're
+  > evaluating this project, make one throwaway request (e.g. load the Dashboard)
+  > and wait for it to resolve before judging response times or submitting a
+  > design for evaluation.
+
 - **Frontend → Vercel:**
   - Build command: `npm run build`; output directory: `dist/`.
-  - Environment variable: `VITE_API_URL` set to your deployed Railway backend's
-    base URL plus `/api` (e.g. `https://your-api.up.railway.app/api`). The client
+  - Environment variable: `VITE_API_URL` set to your deployed Render backend's
+    base URL plus `/api` (e.g. `https://your-app.onrender.com/api`). The client
     reads this via `import.meta.env.VITE_API_URL` (see `client/src/api/client.ts`)
-    and falls back to the relative `/api` path — which only works locally, where
-    Vite's dev proxy forwards it to `http://localhost:4000` (see
-    `client/vite.config.ts`). **`VITE_API_URL` must be set on Vercel** — there is no
-    proxy in a static production build.
+    and falls back to `http://localhost:4000/api` for local dev only.
+    **`VITE_API_URL` must be set on Vercel** — there is no dev-server proxy in a
+    static production build.
+
+### Testing the live deployment
+
+> **⚠️ Before you judge response times or file a bug: the backend is on Render's
+> free tier, which spins down after 15 minutes of inactivity. The first request
+> after a period of idleness can take 30–60 seconds to respond while the service
+> wakes up — this is expected. Every request after that first one is fast.** Load
+> the Dashboard once and wait for the problem list to appear before testing the
+> submit/evaluate flow.
+
+### Environment variables are intentionally not in the repo
+
+Both `server/.env` and `client/.env` (if used) are gitignored on purpose — only
+`.env.example` templates are committed, with placeholder values. **If you're
+reviewing or running this project locally, you must provide your own values**:
+a Neon `DATABASE_URL` (free tier at [neon.tech](https://neon.tech)) and a
+`GEMINI_API_KEY` (free at [aistudio.google.com/apikey](https://aistudio.google.com/apikey)).
+Neither the repo history nor the deployed apps expose these values.
 
 ## Troubleshooting
 
