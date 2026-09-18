@@ -3,8 +3,8 @@
 A focused practice loop for Low-Level Design: **Choose problem → Design → Submit →
 Get AI feedback → Review → Try again.**
 
-See [docs/Research_Note.md](docs/Research_Note.md) for the problem this solves,
-[docs/Design_Note.md](docs/Design_Note.md) for the domain model and architecture,
+See [docs/Research_Note.pdf](docs/Research_Note.pdf) for the problem this solves,
+[docs/Design_Note.pdf](docs/Design_Note.pdf) for the domain model and architecture,
 and [AI_USAGE.md](AI_USAGE.md) for a log of notable AI-assisted decisions made while
 building it.
 
